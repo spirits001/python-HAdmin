@@ -5,5 +5,6 @@ venv
 *.py[cod]
 .idea
 .DS_Store
-h5
-report
+build
+dist
+hadmin.egg-info
