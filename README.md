@@ -23,6 +23,7 @@ class CustomConfigViewSet(mixins.PageConfigMixin, viewsets.GenericViewSet):
     filter_class = CustomFilter
     create_class = CustomCreateSerializer
     read_class = CustomReadSerializer
+    extra = {}
 ```
 其实，就是用HAdmin下的mixins替代rest_framework下的mixins
 
@@ -35,6 +36,8 @@ filter_class 筛选器的配置信息
 create_class 创建数据表单的配置信息
 
 read_class 读取最终数据的配置信息
+
+extra 是额外扩展的数据，可以是字典或者列表等任意可以转换成json的值，会原样递送到前端，用于前端渲染特殊情况下使用，非必填，根据需要使用
 
 每个对应的都是序列化器的的类，序列化器建议每个方法用不同类，这样可以自由定义。
 
@@ -450,6 +453,20 @@ class CustomFilter(django_filters.rest_framework.FilterSet):
 
 ### create_class
 创建类的输出，是为了前端自动构造提交表单而定，序列化器写法没有特别，和list一样，可以在元数据中增加一个custom字典，对应把每个字段的特别要求输送到前端。
+
+和其他不同的是，create的Meta下可以额外增加一个tabs，结构为：
+
+```python
+tabs = [{
+            'label': '基本信息',
+            'fields': ['mobile', 'name', 'region', 'desc']
+        }, {
+            'label': '权限配置',
+            'fields': ['master', 'admins', 'new', 'old', 'rent']
+        }]
+```
+
+这样设定，前端就可以得到这个tabs，可以用于添加表单分步执行。
 
 输出到前端后，对应参数健名为：create
 
