@@ -36,6 +36,15 @@ class PageConfigMixin(ListModelMixin):
     # 扩展自定义信息
     extra = None
 
+    @staticmethod
+    def _build_label(tmp, value):
+        if tmp['label'].replace(" ", "_").lower() == tmp['field_name']:
+            try:
+                tmp['label'] = value.root.Meta.model._meta.get_field(tmp['field_name']).verbose_name
+            except:
+                pass
+        return tmp
+
     def list(self, request, *args, **kwargs):
         # 初始化过滤器的数据模型
         filter_data = {
@@ -87,23 +96,21 @@ class PageConfigMixin(ListModelMixin):
         # 写入类的初始化数据结构
         create = {
             'fields': dict(),
-            'detail': list(),
-            'tabs': list()
+            'detail': list()
         }
         # 判断是否存在写入类
         if self.create_class:
             # 执行一下这个写入序列化器类
             create_serializer = self.create_class()
             # 获取一下Meta里的custom
-            custom = dict()
             try:
                 custom = create_serializer.Meta.custom
             except:
-                pass
+                custom = dict()
             try:
                 create['tabs'] = create_serializer.Meta.tabs
             except:
-                pass
+                create['tabs'] = list()
             # 写入的初始化字段数据可以一次性获得
             create['fields'] = create_serializer.root.data
             # 开始循环包含的字段
@@ -118,12 +125,12 @@ class PageConfigMixin(ListModelMixin):
                         'required': value.required,  # 是否必填
                         'type': str(value.__class__.__name__),  # 字段类型
                         'rules': [],  # 验证器
+                        'choices': [],  # 选择项
+                        'choices_apis': [],  # 选择项远程搜索api接口和关键字段等相关约定,包括创建许可和规则
+                        'method': '',  # 渲染方式，如果没有指定，就采用type来自动匹配
                     }
-                    if tmp['label'].replace(" ", "_").lower() == tmp['field_name']:
-                        try:
-                            tmp['label'] = value.root.Meta.model._meta.get_field(tmp['field_name']).verbose_name
-                        except:
-                            pass
+                    # 清洗一下label
+                    tmp = self._build_label(tmp, value)
                     # 添加rules
                     if value.required:
                         rule = {
@@ -131,31 +138,27 @@ class PageConfigMixin(ListModelMixin):
                             'message': value.error_messages['required']
                         }
                         tmp['rules'].append(rule)
+                    # 把choices的内容放到数据里
+                    try:
+                        for v in value.choices.items():
+                            tmp['choices'].append({
+                                'value': v[0],
+                                'label': v[1]
+                            })
+                    except:
+                        pass
                     # 合并序列化器里的custom定义的内容
                     if value.field_name in custom:
                         tmp.update(custom[value.field_name])
-                    try:
-                        # 如果没设定url，但是字段里有choices内容，那么，就把choices的内容放到数据里
-                        if 'url' not in tmp and value.choices:
-                            choices = list()
-                            for v in value.choices.items():
-                                choices.append({
-                                    'id': str(v[0]),
-                                    'title': str(v[1])
-                                })
-                            tmp['choices'] = choices
-                    except:
-                        pass
                     create['detail'].append(tmp)
         # 列表字段生成器，业务逻辑和创建的差不多了
         list_data = list()
         if self.list_class:
             list_serializer = self.list_class()
-            custom = dict()
             try:
                 custom = list_serializer.Meta.custom
             except:
-                pass
+                custom = dict()
             for key in list_serializer.fields.fields:
                 value = list_serializer.fields.fields[key]
                 tmp = {
@@ -163,13 +166,11 @@ class PageConfigMixin(ListModelMixin):
                     'field_name': value.field_name,
                     'type': str(value.__class__.__name__)
                 }
+                # 清洗一下label
+                tmp = self._build_label(tmp, value)
+                # 覆盖自定义数据到配置字典
                 if value.field_name in custom:
                     tmp.update(custom[value.field_name])
-                if tmp['label'].replace(" ", "_").lower() == tmp['field_name']:
-                    try:
-                        tmp['label'] = value.root.Meta.model._meta.get_field(tmp['field_name']).verbose_name
-                    except:
-                        pass
                 list_data.append(tmp)
         # 读取格式数据，业务逻辑和创建的差不多了
         read_data = list()
@@ -187,13 +188,11 @@ class PageConfigMixin(ListModelMixin):
                     'field_name': value.field_name,
                     'type': str(value.__class__.__name__)
                 }
+                # 清洗一下label
+                tmp = self._build_label(tmp, value)
+                # 覆盖自定义数据到配置字典
                 if value.field_name in custom:
                     tmp.update(custom[value.field_name])
-                if tmp['label'].replace(" ", "_").lower() == tmp['field_name']:
-                    try:
-                        tmp['label'] = value.root.Meta.model._meta.get_field(tmp['field_name']).verbose_name
-                    except:
-                        pass
                 read_data.append(tmp)
         res = {
             "filter": filter_data,
