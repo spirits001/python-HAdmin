@@ -128,7 +128,13 @@ class PageConfigMixin(ListModelMixin):
                         'choices': [],  # 选择项
                         'choices_apis': [],  # 选择项远程搜索api接口和关键字段等相关约定,包括创建许可和规则
                         'method': '',  # 渲染方式，如果没有指定，就采用type来自动匹配
+                        'max_length': 0,  # 最大长度
                     }
+                    # 放入最大长度
+                    try:
+                        tmp['max_length'] = value.max_length
+                    except:
+                        pass
                     # 清洗一下label
                     tmp = self._build_label(tmp, value)
                     # 添加rules
