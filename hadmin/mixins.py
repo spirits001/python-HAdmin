@@ -35,6 +35,8 @@ class PageConfigMixin(ListModelMixin):
     read_class = None
     # 扩展自定义信息
     extra = None
+    # 选择性最多数量
+    choices_limit = 30
 
     @staticmethod
     def _build_label(tmp, value):
@@ -145,14 +147,14 @@ class PageConfigMixin(ListModelMixin):
                         }
                         tmp['rules'].append(rule)
                     # 把choices的内容放到数据里
-                    try:
-                        for v in value.choices.items():
-                            tmp['choices'].append({
-                                'value': v[0],
-                                'label': v[1]
-                            })
-                    except:
-                        pass
+                    if tmp['type'] in ['PrimaryKeyRelatedField', 'ManyRelatedField', 'ChoiceField']:
+                        if tmp['type'] == 'ChoiceField' or (tmp['type'] == 'ManyRelatedField' and value.child_relation.queryset.count() < self.choices_limit) or (
+                                tmp['type'] == 'PrimaryKeyRelatedField' and value.queryset.count() < self.choices_limit):
+                            for v in value.choices.items():
+                                tmp['choices'].append({
+                                    'value': v[0],
+                                    'label': v[1]
+                                })
                     # 合并序列化器里的custom定义的内容
                     if value.field_name in custom:
                         tmp.update(custom[value.field_name])
