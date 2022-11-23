@@ -37,15 +37,77 @@ class PageConfigMixin(ListModelMixin):
     extra = None
     # 默认选择项数量
     choices_limit = 30
+    # inline模式默认数量限制
+    inlines_limit = 10
 
     @staticmethod
     def _build_label(tmp, value):
+        """
+        清理label
+        """
         if tmp['label'].replace(" ", "_").lower() == tmp['field_name']:
             try:
                 tmp['label'] = value.root.Meta.model._meta.get_field(tmp['field_name']).verbose_name
             except:
                 pass
         return tmp
+
+    def _build_create(self, create, custom, value):
+        """
+        创建配置函数
+        """
+        # 如果这个字段不是只读模式
+        if not value.read_only and not value.__class__.__name__ == 'HiddenField':
+            tmp = {
+                'label': value.label,  # 字段名称
+                'help_text': value.help_text,  # 辅助说明，默认读取模型的，如果序列化器设定了，就是序列化器的了
+                'field_name': value.field_name,  # 字段名
+                'required': value.required,  # 是否必填
+                'type': value.__class__.__name__,  # 字段类型
+                'rules': [],  # 验证器
+                'choices': [],  # 选择项
+                'choices_apis': [],  # 选择项远程搜索api接口和关键字段等相关约定,包括创建许可和规则
+                'method': '',  # 渲染方式，如果没有指定，就采用type来自动匹配
+                'max_length': 0,  # 最大长度
+                'precision': None,  # 小数长度
+            }
+            # 原始字段类型
+            try:
+                tmp['field'] = value.root.Meta.model._meta.get_field(value.field_name).__class__.__name__
+            except:
+                tmp['field'] = None
+            # 放入小数长度
+            if tmp['type'] == 'DecimalField':
+                tmp['precision'] = value.decimal_places
+            if tmp['type'] == 'IntegerField':
+                tmp['precision'] = 0
+            # 放入最大长度
+            try:
+                tmp['max_length'] = value.max_length
+            except:
+                pass
+            # 清洗一下label
+            tmp = self._build_label(tmp, value)
+            # 添加rules
+            if value.required:
+                rule = {
+                    'required': True,
+                    'message': value.error_messages['required']
+                }
+                tmp['rules'].append(rule)
+            # 把choices的内容放到数据里,这里要判断选择项数量，太多了可不行
+            if tmp['type'] in ['PrimaryKeyRelatedField', 'ManyRelatedField', 'ChoiceField']:
+                if tmp['type'] == 'ChoiceField' or (tmp['type'] == 'ManyRelatedField' and value.child_relation.queryset.count() < self.choices_limit) or (
+                        tmp['type'] == 'PrimaryKeyRelatedField' and value.queryset.count() < self.choices_limit):
+                    for v in value.choices.items():
+                        tmp['choices'].append({
+                            'value': v[0],
+                            'label': v[1]
+                        })
+            # 合并序列化器里的custom定义的内容
+            if value.field_name in custom:
+                tmp.update(custom[value.field_name])
+            create['detail'].append(tmp)
 
     def list(self, request, *args, **kwargs):
         # 初始化过滤器的数据模型
@@ -98,6 +160,7 @@ class PageConfigMixin(ListModelMixin):
         # 写入类的初始化数据结构
         create = {
             'fields': dict(),
+            'inlines': dict(),
             'detail': list()
         }
         # 判断是否存在写入类
@@ -113,6 +176,10 @@ class PageConfigMixin(ListModelMixin):
                 create['tabs'] = create_serializer.Meta.tabs
             except:
                 create['tabs'] = list()
+            try:
+                inlines = create_serializer.Meta.inlines
+            except:
+                inlines = dict()
             # 写入的初始化字段数据可以一次性获得
             create['fields'] = create_serializer.root.data
             # 开始循环包含的字段
@@ -120,59 +187,35 @@ class PageConfigMixin(ListModelMixin):
                 value = create_serializer.fields.fields[key]
                 if value.__class__.__name__ == 'HiddenField' and value.field_name in create['fields']:
                     del create['fields'][value.field_name]
-                # 如果这个字段不是只读模式
-                if not value.read_only and not value.__class__.__name__ == 'HiddenField':
-                    tmp = {
-                        'label': value.label,  # 字段名称
-                        'help_text': value.help_text,  # 辅助说明，默认读取模型的，如果序列化器设定了，就是序列化器的了
-                        'field_name': value.field_name,  # 字段名
-                        'required': value.required,  # 是否必填
-                        'type': value.__class__.__name__,  # 字段类型
-                        'rules': [],  # 验证器
-                        'choices': [],  # 选择项
-                        'choices_apis': [],  # 选择项远程搜索api接口和关键字段等相关约定,包括创建许可和规则
-                        'method': '',  # 渲染方式，如果没有指定，就采用type来自动匹配
-                        'max_length': 0,  # 最大长度
-                        'precision': None,  # 小数长度
-                    }
-                    # 原始字段类型
-                    try:
-                        tmp['field'] = value.root.Meta.model._meta.get_field(value.field_name).__class__.__name__
-                    except:
-                        tmp['field'] = None
-                    # 放入小数长度
-                    if tmp['type'] == 'DecimalField':
-                        tmp['precision'] = value.decimal_places
-                    if tmp['type'] == 'IntegerField':
-                        tmp['precision'] = 0
-                    # 放入最大长度
-                    try:
-                        tmp['max_length'] = value.max_length
-                    except:
-                        pass
-                    # 清洗一下label
-                    tmp = self._build_label(tmp, value)
-                    # 添加rules
-                    if value.required:
-                        rule = {
-                            'required': True,
-                            'message': value.error_messages['required']
-                        }
-                        tmp['rules'].append(rule)
-                    # 把choices的内容放到数据里,这里要判断选择项数量，太多了可不行
-                    if tmp['type'] in ['PrimaryKeyRelatedField', 'ManyRelatedField', 'ChoiceField']:
-                        limit = 30
-                        if tmp['type'] == 'ChoiceField' or (tmp['type'] == 'ManyRelatedField' and value.child_relation.queryset.count() < self.choices_limit) or (
-                                tmp['type'] == 'PrimaryKeyRelatedField' and value.queryset.count() < self.choices_limit):
-                            for v in value.choices.items():
-                                tmp['choices'].append({
-                                    'value': v[0],
-                                    'label': v[1]
-                                })
-                    # 合并序列化器里的custom定义的内容
-                    if value.field_name in custom:
-                        tmp.update(custom[value.field_name])
-                    create['detail'].append(tmp)
+                self._build_create(create, custom, value)
+            for inline_key, inline_value in inlines.items():
+                inline_create = {
+                    'fields': dict(),
+                    'detail': list(),
+                    'inlines': dict()
+                }
+                inline_serializer = inline_value['class']()
+                try:
+                    inline_custom = inline_serializer.Meta.custom
+                except:
+                    inline_custom = dict()
+                try:
+                    inline_create['tabs'] = inline_serializer.Meta.tabs
+                except:
+                    inline_create['tabs'] = list()
+                inline_create['fields'] = inline_serializer.root.data
+                for field_key in inline_serializer.fields.fields:
+                    field_value = inline_serializer.fields.fields[field_key]
+                    if field_value.__class__.__name__ == 'HiddenField' and field_value.field_name in inline_create['fields']:
+                        del inline_create['fields'][field_value.field_name]
+                    self._build_create(inline_create, inline_custom, field_value)
+                create['inlines'][inline_key] = {
+                    'label': inline_value['label'] if 'label' in inline_value else inline_serializer.Meta.model._meta.verbose_name,
+                    'create': inline_create,
+                    'limit': inline_value['limit'] if 'limit' in inline_value else self.inlines_limit,
+                    'api': inline_value['api'] if 'api' in inline_value else '',
+                }
+                create['fields'][inline_key] = []
         # 列表字段生成器，业务逻辑和创建的差不多了
         list_data = list()
         if self.list_class:
