@@ -18,10 +18,8 @@
 
 ## 安装
 
-```python
-pip
-install
-hadmin
+```bash
+pip install hadmin
 ```
 
 ## 使用方式
@@ -61,368 +59,517 @@ extra 是额外扩展的数据，可以是字典或者列表等任意可以转�
 
 ```json
 {
-  "filter": {
-    "base": [
-      {
-        "label": "手机号",
-        "method": "input",
-        "default": "",
-        "url": "",
-        "limit": 1,
-        "span": 6,
-        "key": "mobile"
-      },
-      {
-        "label": "姓名",
-        "method": "input",
-        "default": "",
-        "url": "",
-        "limit": 1,
-        "span": 6,
-        "key": "name"
-      },
-      {
-        "label": "姓名",
-        "method": "input",
-        "default": "",
-        "url": "",
-        "limit": 1,
-        "span": 6,
-        "key": "desc"
-      },
-      {
-        "label": "新房客源",
-        "method": "select",
-        "default": "",
-        "url": "",
-        "limit": 1,
-        "span": 6,
-        "key": "new",
-        "options": [
-          {
-            "id": "-1000",
-            "title": "不限"
-          },
-          {
-            "id": "true",
-            "title": "是"
-          },
-          {
-            "id": "false",
-            "title": "否"
-          },
-          {
-            "id": "isnull",
-            "title": "未填写"
-          }
-        ]
-      },
-      {
-        "label": "二手房客源",
-        "method": "select",
-        "default": "",
-        "url": "",
-        "limit": 1,
-        "span": 6,
-        "key": "old",
-        "options": [
-          {
-            "id": "-1000",
-            "title": "不限"
-          },
-          {
-            "id": "true",
-            "title": "是"
-          },
-          {
-            "id": "false",
-            "title": "否"
-          },
-          {
-            "id": "isnull",
-            "title": "未填写"
-          }
-        ]
-      },
-      {
-        "label": "租房客源",
-        "method": "select",
-        "default": "",
-        "url": "",
-        "limit": 1,
-        "span": 6,
-        "key": "rent",
-        "options": [
-          {
-            "id": "-1000",
-            "title": "不限"
-          },
-          {
-            "id": "true",
-            "title": "是"
-          },
-          {
-            "id": "false",
-            "title": "否"
-          },
-          {
-            "id": "isnull",
-            "title": "未填写"
-          }
-        ]
-      }
-    ],
-    "adv": [],
-    "height": 100,
-    "fields": {
-      "mobile": "",
-      "name": "",
-      "desc": "",
-      "new": "",
-      "old": "",
-      "rent": ""
-    }
-  },
-  "create": {
-    "fields": {
-      "master": null,
-      "region": null,
-      "admins": [],
-      "mobile": "",
-      "name": "",
-      "new": false,
-      "old": false,
-      "rent": false,
-      "desc": ""
-    },
-    "detail": [
-      {
-        "label": "主理人",
-        "help_text": null,
-        "field_name": "master",
-        "required": true,
-        "type": "PrimaryKeyRelatedField",
-        "choices": [
-          {
-            "id": "1",
-            "title": "hofeng"
-          },
-          {
-            "id": "13",
-            "title": "18961330033"
-          },
-          {
-            "id": "83",
-            "title": "shanghai001"
-          },
-          {
-            "id": "84",
-            "title": "shanghai002"
-          },
-          {
-            "id": "85",
-            "title": "shanghai003"
-          },
-          {
-            "id": "86",
-            "title": "suqian001"
-          }
-        ]
-      },
-      {
-        "label": "地区",
-        "help_text": null,
-        "field_name": "region",
-        "required": true,
-        "type": "PrimaryKeyRelatedField",
-        "choices": [
-          {
-            "id": "1",
-            "title": "上海【310000】"
-          },
-          {
-            "id": "21",
-            "title": "宿迁【321300】"
-          },
-          {
-            "id": "34",
-            "title": "盐城【320900】"
-          }
-        ]
-      },
-      {
-        "label": "协作人",
-        "help_text": null,
-        "field_name": "admins",
-        "required": true,
-        "type": "ManyRelatedField",
-        "choices": [
-          {
-            "id": "1",
-            "title": "hofeng"
-          },
-          {
-            "id": "13",
-            "title": "18961330033"
-          },
-          {
-            "id": "83",
-            "title": "shanghai001"
-          },
-          {
-            "id": "84",
-            "title": "shanghai002"
-          },
-          {
-            "id": "85",
-            "title": "shanghai003"
-          },
-          {
-            "id": "86",
-            "title": "suqian001"
-          }
-        ]
-      },
-      {
-        "label": "手机号",
-        "help_text": "客源手机号",
-        "field_name": "mobile",
-        "required": true,
-        "type": "CharField"
-      },
-      {
-        "label": "姓名",
-        "help_text": null,
-        "field_name": "name",
-        "required": false,
-        "type": "CharField"
-      },
-      {
-        "label": "新房客源",
-        "help_text": null,
-        "field_name": "new",
-        "required": false,
-        "type": "BooleanField"
-      },
-      {
-        "label": "二手房客源",
-        "help_text": null,
-        "field_name": "old",
-        "required": false,
-        "type": "BooleanField"
-      },
-      {
-        "label": "租房客源",
-        "help_text": null,
-        "field_name": "rent",
-        "required": false,
-        "type": "BooleanField"
-      },
-      {
-        "label": "简要说明",
-        "help_text": null,
-        "field_name": "desc",
-        "required": false,
-        "type": "CharField",
-        "base_template": "textarea.html"
-      }
-    ]
-  },
-  "list": [
-    {
-      "label": "ID",
-      "field_name": "id",
-      "type": "IntegerField",
-      "width": "80"
-    },
-    {
-      "label": "手机号",
-      "field_name": "mobile",
-      "type": "CharField"
-    },
-    {
-      "label": "姓名",
-      "field_name": "name",
-      "type": "CharField"
-    },
-    {
-      "label": "主理人",
-      "field_name": "master",
-      "type": "StringRelatedField"
-    },
-    {
-      "label": "新房客源",
-      "field_name": "new",
-      "type": "BooleanField"
-    },
-    {
-      "label": "二手房客源",
-      "field_name": "old",
-      "type": "BooleanField"
-    },
-    {
-      "label": "租房客源",
-      "field_name": "rent",
-      "type": "BooleanField"
-    },
-    {
-      "label": "添加时间",
-      "field_name": "add_time",
-      "type": "DateTimeField"
-    }
-  ],
-  "read": [
-    {
-      "label": "主理人",
-      "field_name": "master",
-      "type": "StringRelatedField"
-    },
-    {
-      "label": "地区",
-      "field_name": "region",
-      "type": "StringRelatedField"
-    },
-    {
-      "label": "协作人",
-      "field_name": "admins",
-      "type": "ManyRelatedField"
-    },
-    {
-      "label": "添加时间",
-      "field_name": "add_time",
-      "type": "DateTimeField"
-    },
-    {
-      "label": "手机号",
-      "field_name": "mobile",
-      "type": "CharField"
-    },
-    {
-      "label": "姓名",
-      "field_name": "name",
-      "type": "CharField"
-    },
-    {
-      "label": "新房客源",
-      "field_name": "new",
-      "type": "BooleanField"
-    },
-    {
-      "label": "二手房客源",
-      "field_name": "old",
-      "type": "BooleanField"
-    },
-    {
-      "label": "租房客源",
-      "field_name": "rent",
-      "type": "BooleanField"
-    },
-    {
-      "label": "简要说明",
-      "field_name": "desc",
-      "type": "CharField"
-    }
-  ]
+	"filter": {
+		"base": [{
+			"label": "手机号",
+			"method": "input",
+			"default": "",
+			"url": "",
+			"limit": 1,
+			"span": 6,
+			"key": "mobile"
+		}, {
+			"label": "姓名",
+			"method": "input",
+			"default": "",
+			"url": "",
+			"limit": 1,
+			"span": 6,
+			"key": "name"
+		}, {
+			"label": "姓名",
+			"method": "input",
+			"default": "",
+			"url": "",
+			"limit": 1,
+			"span": 6,
+			"key": "desc"
+		}, {
+			"label": "新房客源",
+			"method": "select",
+			"default": "",
+			"url": "",
+			"limit": 1,
+			"span": 6,
+			"key": "new",
+			"options": [{
+				"id": "-1000",
+				"title": "不限"
+			}, {
+				"id": "true",
+				"title": "是"
+			}, {
+				"id": "false",
+				"title": "否"
+			}, {
+				"id": "isnull",
+				"title": "未填写"
+			}]
+		}, {
+			"label": "二手房客源",
+			"method": "select",
+			"default": "",
+			"url": "",
+			"limit": 1,
+			"span": 6,
+			"key": "old",
+			"options": [{
+				"id": "-1000",
+				"title": "不限"
+			}, {
+				"id": "true",
+				"title": "是"
+			}, {
+				"id": "false",
+				"title": "否"
+			}, {
+				"id": "isnull",
+				"title": "未填写"
+			}]
+		}, {
+			"label": "租房客源",
+			"method": "select",
+			"default": "",
+			"url": "",
+			"limit": 1,
+			"span": 6,
+			"key": "rent",
+			"options": [{
+				"id": "-1000",
+				"title": "不限"
+			}, {
+				"id": "true",
+				"title": "是"
+			}, {
+				"id": "false",
+				"title": "否"
+			}, {
+				"id": "isnull",
+				"title": "未填写"
+			}]
+		}],
+		"adv": [],
+		"height": 100,
+		"fields": {
+			"mobile": "",
+			"name": "",
+			"desc": "",
+			"new": "",
+			"old": "",
+			"rent": ""
+		}
+	},
+	"create": {
+		"fields": {
+			"master": null,
+			"region": null,
+			"admins": [],
+			"mobile": "",
+			"name": "",
+			"new": false,
+			"old": false,
+			"rent": false,
+			"desc": "",
+			"custom": []
+		},
+		"inlines": {
+			"custom": {
+				"label": "跟踪记录",
+				"create": {
+					"fields": {
+						"custom": null,
+						"date": null,
+						"body": "",
+						"result": "",
+						"image": null,
+						"file": null
+					},
+					"detail": [{
+						"label": "客源",
+						"help_text": null,
+						"field_name": "custom",
+						"required": true,
+						"type": "PrimaryKeyRelatedField",
+						"rules": [{
+							"required": true,
+							"message": "该字段是必填项。"
+						}],
+						"choices": [{
+							"value": 13,
+							"label": "18888888885"
+						}, {
+							"value": 12,
+							"label": "18888888884"
+						}, {
+							"value": 11,
+							"label": "18888888883"
+						}, {
+							"value": 10,
+							"label": "18888888882"
+						}, {
+							"value": 8,
+							"label": "13999999990"
+						}, {
+							"value": 7,
+							"label": "13999999994"
+						}, {
+							"value": 6,
+							"label": "13999999995"
+						}, {
+							"value": 5,
+							"label": "13999999996"
+						}, {
+							"value": 4,
+							"label": "13999999997"
+						}, {
+							"value": 3,
+							"label": "13999999998"
+						}, {
+							"value": 2,
+							"label": "13999999999"
+						}, {
+							"value": 1,
+							"label": "13888888888"
+						}],
+						"choices_apis": [],
+						"method": "",
+						"max_length": 0,
+						"precision": null,
+						"field": "ForeignKey"
+					}, {
+						"label": "时间",
+						"help_text": null,
+						"field_name": "date",
+						"required": true,
+						"type": "DateField",
+						"rules": [{
+							"required": true,
+							"message": "该字段是必填项。"
+						}],
+						"choices": [],
+						"choices_apis": [],
+						"method": "",
+						"max_length": 0,
+						"precision": null,
+						"field": "DateField"
+					}, {
+						"label": "内容",
+						"help_text": null,
+						"field_name": "body",
+						"required": true,
+						"type": "CharField",
+						"rules": [{
+							"required": true,
+							"message": "该字段是必填项。"
+						}],
+						"choices": [],
+						"choices_apis": [],
+						"method": "",
+						"max_length": 10000,
+						"precision": null,
+						"field": "TextField"
+					}, {
+						"label": "结果",
+						"help_text": null,
+						"field_name": "result",
+						"required": false,
+						"type": "CharField",
+						"rules": [],
+						"choices": [],
+						"choices_apis": [],
+						"method": "",
+						"max_length": 10000,
+						"precision": null,
+						"field": "TextField"
+					}, {
+						"label": "图片",
+						"help_text": null,
+						"field_name": "image",
+						"required": false,
+						"type": "ImageField",
+						"rules": [],
+						"choices": [],
+						"choices_apis": [],
+						"method": "",
+						"max_length": 100,
+						"precision": null,
+						"field": "ImageField"
+					}, {
+						"label": "附件",
+						"help_text": null,
+						"field_name": "file",
+						"required": false,
+						"type": "FileField",
+						"rules": [],
+						"choices": [],
+						"choices_apis": [],
+						"method": "",
+						"max_length": 100,
+						"precision": null,
+						"field": "FileField"
+					}],
+					"inlines": {},
+					"tabs": []
+				},
+				"limit": 10,
+				"api": "/admin/user/track/data/"
+			}
+		},
+		"detail": [{
+			"label": "主理人",
+			"help_text": null,
+			"field_name": "master",
+			"required": false,
+			"type": "PrimaryKeyRelatedField",
+			"rules": [],
+			"choices": [{
+				"value": 1,
+				"label": "hofeng"
+			}, {
+				"value": 13,
+				"label": "18961330033"
+			}, {
+				"value": 83,
+				"label": "shanghai001"
+			}, {
+				"value": 84,
+				"label": "shanghai002"
+			}, {
+				"value": 85,
+				"label": "shanghai003"
+			}, {
+				"value": 86,
+				"label": "suqian001"
+			}],
+			"choices_apis": [],
+			"method": "",
+			"max_length": 0,
+			"precision": null,
+			"field": "ForeignKey"
+		}, {
+			"label": "地区",
+			"help_text": null,
+			"field_name": "region",
+			"required": true,
+			"type": "PrimaryKeyRelatedField",
+			"rules": [{
+				"required": true,
+				"message": "该字段是必填项。"
+			}],
+			"choices": [{
+				"value": 1,
+				"label": "上海【310000】"
+			}, {
+				"value": 21,
+				"label": "宿迁【321300】"
+			}, {
+				"value": 34,
+				"label": "盐城【320900】"
+			}],
+			"choices_apis": [],
+			"method": "",
+			"max_length": 0,
+			"precision": null,
+			"field": "ForeignKey"
+		}, {
+			"label": "协作人",
+			"help_text": null,
+			"field_name": "admins",
+			"required": false,
+			"type": "ManyRelatedField",
+			"rules": [],
+			"choices": [{
+				"value": 1,
+				"label": "hofeng"
+			}, {
+				"value": 13,
+				"label": "18961330033"
+			}, {
+				"value": 83,
+				"label": "shanghai001"
+			}, {
+				"value": 84,
+				"label": "shanghai002"
+			}, {
+				"value": 85,
+				"label": "shanghai003"
+			}, {
+				"value": 86,
+				"label": "suqian001"
+			}],
+			"choices_apis": [],
+			"method": "",
+			"max_length": 0,
+			"precision": null,
+			"field": "ManyToManyField"
+		}, {
+			"label": "手机号",
+			"help_text": "客源手机号",
+			"field_name": "mobile",
+			"required": true,
+			"type": "CharField",
+			"rules": [{
+				"required": true,
+				"message": "该字段是必填项。"
+			}],
+			"choices": [],
+			"choices_apis": [],
+			"method": "",
+			"max_length": 11,
+			"precision": null,
+			"field": "CharField"
+		}, {
+			"label": "姓名",
+			"help_text": null,
+			"field_name": "name",
+			"required": false,
+			"type": "CharField",
+			"rules": [],
+			"choices": [],
+			"choices_apis": [],
+			"method": "",
+			"max_length": 32,
+			"precision": null,
+			"field": "CharField"
+		}, {
+			"label": "新房客源",
+			"help_text": null,
+			"field_name": "new",
+			"required": false,
+			"type": "BooleanField",
+			"rules": [],
+			"choices": [],
+			"choices_apis": [],
+			"method": "",
+			"max_length": 0,
+			"precision": null,
+			"field": "BooleanField"
+		}, {
+			"label": "二手房客源",
+			"help_text": null,
+			"field_name": "old",
+			"required": false,
+			"type": "BooleanField",
+			"rules": [],
+			"choices": [],
+			"choices_apis": [],
+			"method": "",
+			"max_length": 0,
+			"precision": null,
+			"field": "BooleanField"
+		}, {
+			"label": "租房客源",
+			"help_text": null,
+			"field_name": "rent",
+			"required": false,
+			"type": "BooleanField",
+			"rules": [],
+			"choices": [],
+			"choices_apis": [],
+			"method": "",
+			"max_length": 0,
+			"precision": null,
+			"field": "BooleanField"
+		}, {
+			"label": "简要说明",
+			"help_text": null,
+			"field_name": "desc",
+			"required": false,
+			"type": "CharField",
+			"rules": [],
+			"choices": [],
+			"choices_apis": [],
+			"method": "",
+			"max_length": 2000,
+			"precision": null,
+			"field": "TextField"
+		}],
+		"tabs": []
+	},
+	"list": [{
+		"label": "ID",
+		"field_name": "id",
+		"type": "IntegerField",
+		"field": "AutoField",
+		"width": "80"
+	}, {
+		"label": "手机号",
+		"field_name": "mobile",
+		"type": "CharField",
+		"field": "CharField"
+	}, {
+		"label": "姓名",
+		"field_name": "name",
+		"type": "CharField",
+		"field": "CharField"
+	}, {
+		"label": "主理人",
+		"field_name": "master",
+		"type": "StringRelatedField",
+		"field": "ForeignKey"
+	}, {
+		"label": "新房客源",
+		"field_name": "new",
+		"type": "BooleanField",
+		"field": "BooleanField"
+	}, {
+		"label": "二手房客源",
+		"field_name": "old",
+		"type": "BooleanField",
+		"field": "BooleanField"
+	}, {
+		"label": "租房客源",
+		"field_name": "rent",
+		"type": "BooleanField",
+		"field": "BooleanField"
+	}, {
+		"label": "添加时间",
+		"field_name": "add_time",
+		"type": "DateTimeField",
+		"field": "DateTimeField"
+	}],
+	"read": [{
+		"label": "主理人",
+		"field_name": "master",
+		"type": "StringRelatedField"
+	}, {
+		"label": "地区",
+		"field_name": "region",
+		"type": "StringRelatedField"
+	}, {
+		"label": "协作人",
+		"field_name": "admins",
+		"type": "ManyRelatedField"
+	}, {
+		"label": "添加时间",
+		"field_name": "add_time",
+		"type": "DateTimeField"
+	}, {
+		"label": "手机号",
+		"field_name": "mobile",
+		"type": "CharField"
+	}, {
+		"label": "姓名",
+		"field_name": "name",
+		"type": "CharField"
+	}, {
+		"label": "新房客源",
+		"field_name": "new",
+		"type": "BooleanField"
+	}, {
+		"label": "二手房客源",
+		"field_name": "old",
+		"type": "BooleanField"
+	}, {
+		"label": "租房客源",
+		"field_name": "rent",
+		"type": "BooleanField"
+	}, {
+		"label": "简要说明",
+		"field_name": "desc",
+		"type": "CharField"
+	}],
+	"extra": null
 }
 ```
 
@@ -499,6 +646,7 @@ inlines = {
 }
 ```
 说明：健名是作为主键的字段名，也就是其他子数据的主字段名；class是这个子数据创建的序列化器；api是创建接口；limit是一次最多多少个
+
 这样设定，前端就可以得到这个tabs，可以用于添加表单分步执行。
 
 输出到前端后，对应参数健名为：create
