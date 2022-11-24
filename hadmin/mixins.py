@@ -52,6 +52,56 @@ class PageConfigMixin(ListModelMixin):
                 pass
         return tmp
 
+    def _build_list(self, class_method):
+        list_data = list()
+        if class_method:
+            list_serializer = class_method()
+            try:
+                custom = list_serializer.Meta.custom
+            except:
+                custom = dict()
+            for key in list_serializer.fields.fields:
+                value = list_serializer.fields.fields[key]
+                tmp = {
+                    'label': value.label,
+                    'field_name': value.field_name,
+                    'type': value.__class__.__name__,  # 字段类型
+                    'required': value.required,  # 是否必填
+                    'rules': [],  # 验证器
+                    'method': '',  # 渲染方式，如果没有指定，就采用type来自动匹配
+                    'max_length': 0,  # 最大长度
+                    'precision': None,  # 小数长度
+                }
+                # 原始字段类型
+                try:
+                    tmp['field'] = value.root.Meta.model._meta.get_field(value.field_name).__class__.__name__
+                except:
+                    tmp['field'] = None
+                # 放入小数长度
+                if tmp['type'] == 'DecimalField':
+                    tmp['precision'] = value.decimal_places
+                if tmp['type'] == 'IntegerField':
+                    tmp['precision'] = 0
+                # 放入最大长度
+                try:
+                    tmp['max_length'] = value.max_length
+                except:
+                    pass
+                # 添加rules
+                if value.required:
+                    rule = {
+                        'required': True,
+                        'message': value.error_messages['required']
+                    }
+                    tmp['rules'].append(rule)
+                # 清洗一下label
+                tmp = self._build_label(tmp, value)
+                # 覆盖自定义数据到配置字典
+                if value.field_name in custom:
+                    tmp.update(custom[value.field_name])
+                list_data.append(tmp)
+        return list_data
+
     def _build_create(self, create, custom, value):
         """
         创建配置函数
@@ -216,59 +266,11 @@ class PageConfigMixin(ListModelMixin):
                     'api': inline_value['api'] if 'api' in inline_value else '',
                 }
                 create['fields'][inline_key] = []
-        # 列表字段生成器，业务逻辑和创建的差不多了
-        list_data = list()
-        if self.list_class:
-            list_serializer = self.list_class()
-            try:
-                custom = list_serializer.Meta.custom
-            except:
-                custom = dict()
-            for key in list_serializer.fields.fields:
-                value = list_serializer.fields.fields[key]
-                tmp = {
-                    'label': value.label,
-                    'field_name': value.field_name,
-                    'type': value.__class__.__name__,  # 字段类型
-                }
-                # 原始字段类型
-                try:
-                    tmp['field'] = value.root.Meta.model._meta.get_field(value.field_name).__class__.__name__
-                except:
-                    tmp['field'] = None
-                # 清洗一下label
-                tmp = self._build_label(tmp, value)
-                # 覆盖自定义数据到配置字典
-                if value.field_name in custom:
-                    tmp.update(custom[value.field_name])
-                list_data.append(tmp)
-        # 读取格式数据，业务逻辑和创建的差不多了
-        read_data = list()
-        if self.read_class:
-            read_serializer = self.read_class()
-            custom = dict()
-            try:
-                custom = read_serializer.Meta.custom
-            except:
-                pass
-            for key in read_serializer.fields.fields:
-                value = read_serializer.fields.fields[key]
-                tmp = {
-                    'label': value.label,
-                    'field_name': value.field_name,
-                    'type': str(value.__class__.__name__)
-                }
-                # 清洗一下label
-                tmp = self._build_label(tmp, value)
-                # 覆盖自定义数据到配置字典
-                if value.field_name in custom:
-                    tmp.update(custom[value.field_name])
-                read_data.append(tmp)
         res = {
             "filter": filter_data,
             "create": create,
-            "list": list_data,
-            "read": read_data,
+            "list": self._build_list(self.list_class),  # 列表字段生成器，业务逻辑和创建的差不多了
+            "read": self._build_list(self.read_class),  # 读取格式数据，业务逻辑和创建的差不多了
             "extra": self.extra
         }
         return Response(res)
