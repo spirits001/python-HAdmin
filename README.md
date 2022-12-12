@@ -672,3 +672,5 @@ inlines = {
 1.0.7 增加inline模式的配置数据输出，规则见create_class说明
 
 1.0.8 优化了代码，聚类了函数；增加list和read方式下的参数，为patch字段级提供方便
+
+1.0.9 修正inlines的bug
