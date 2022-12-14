@@ -116,7 +116,6 @@ class PageConfigMixin(ListModelMixin):
                 'type': value.__class__.__name__,  # 字段类型
                 'rules': [],  # 验证器
                 'choices': [],  # 选择项
-                'choices_apis': [],  # 选择项远程搜索api接口和关键字段等相关约定,包括创建许可和规则
                 'method': '',  # 渲染方式，如果没有指定，就采用type来自动匹配
                 'max_length': 0,  # 最大长度
                 'precision': None,  # 小数长度
@@ -254,8 +253,12 @@ class PageConfigMixin(ListModelMixin):
                 except:
                     inline_create['tabs'] = list()
                 inline_create['fields'] = inline_serializer.root.data
+                field = inline_value['field'] if 'field' in inline_value else inline_key
+                del inline_create['fields'][field]
                 for field_key in inline_serializer.fields.fields:
                     field_value = inline_serializer.fields.fields[field_key]
+                    if field_value.field_name == field:
+                        continue
                     if field_value.__class__.__name__ == 'HiddenField' and field_value.field_name in inline_create['fields']:
                         del inline_create['fields'][field_value.field_name]
                     self._build_create(inline_create, inline_custom, field_value)
@@ -264,7 +267,7 @@ class PageConfigMixin(ListModelMixin):
                     'create': inline_create,
                     'limit': inline_value['limit'] if 'limit' in inline_value else self.inlines_limit,
                     'api': inline_value['api'] if 'api' in inline_value else '',
-                    'field': inline_value['field'] if 'field' in inline_value else inline_key,
+                    'field': field
                 }
                 create['fields'][inline_key] = []
         res = {
