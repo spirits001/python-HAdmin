@@ -155,6 +155,8 @@ class PageConfigMixin(ListModelMixin):
                         })
             # 合并序列化器里的custom定义的内容
             if value.field_name in custom:
+                if 'search' in custom[value.field_name]:
+                    tmp['choices'] = []
                 tmp.update(custom[value.field_name])
             create['detail'].append(tmp)
 

@@ -674,3 +674,5 @@ inlines = {
 1.0.8 优化了代码，聚类了函数；增加list和read方式下的参数，为patch字段级提供方便
 
 1.0.9 修正inlines的bug
+
+1.0.10 修正create的bug
