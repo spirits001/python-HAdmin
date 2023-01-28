@@ -238,6 +238,8 @@ class PageConfigMixin(ListModelMixin):
                 value = create_serializer.fields.fields[key]
                 if value.__class__.__name__ == 'HiddenField' and value.field_name in create['fields']:
                     del create['fields'][value.field_name]
+                if not isinstance(value.default, type) and value.field_name in create['fields']:
+                    create['fields'][value.field_name] = value.default
                 self._build_create(create, custom, value)
             for inline_key, inline_value in inlines.items():
                 inline_create = {
