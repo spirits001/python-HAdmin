@@ -234,12 +234,16 @@ class PageConfigMixin(ListModelMixin):
             # 写入的初始化字段数据可以一次性获得
             create['fields'] = create_serializer.root.data
             # 开始循环包含的字段
+            meta = dict()
+            for m in create_serializer.Meta.model._meta.fields:
+                if not isinstance(m.default, type):
+                    meta[m.attname] = bool(m.default) if m.__class__.__name__ == 'BoolField' else m.default
             for key in create_serializer.fields.fields:
                 value = create_serializer.fields.fields[key]
                 if value.__class__.__name__ == 'HiddenField' and value.field_name in create['fields']:
                     del create['fields'][value.field_name]
-                if not isinstance(value.default, type) and value.field_name in create['fields']:
-                    create['fields'][value.field_name] = value.default
+                if value.field_name in create['fields'] and value.field_name in meta:
+                    create['fields'][value.field_name] = meta[value.field_name]
                 self._build_create(create, custom, value)
             for inline_key, inline_value in inlines.items():
                 inline_create = {

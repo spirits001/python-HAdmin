@@ -678,3 +678,5 @@ inlines = {
 1.0.10 修正create的bug
 
 1.0.11 增加default值的输出
+
+1.0.12 修复bug
