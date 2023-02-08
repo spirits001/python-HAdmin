@@ -33,6 +33,8 @@ class PageConfigMixin(ListModelMixin):
     list_class = None
     # 读取的序列化器类
     read_class = None
+    # 修改序列化器类
+    update_class = None
     # 扩展自定义信息
     extra = None
     # 默认选择项数量
@@ -208,6 +210,76 @@ class PageConfigMixin(ListModelMixin):
             height = (span // 24 + int(bool(span % 24))) * 50
             if height > filter_data['height']:
                 filter_data['height'] = height
+        # 修改类的初始化数据结构
+        update = {
+            'fields': dict(),
+            'inlines': dict(),
+            'detail': list()
+        }
+        # 判断是否存在修改类
+        if self.update_class:
+            # 执行一下这个写入序列化器类
+            update_serializer = self.update_class()
+            # 获取一下Meta里的custom
+            try:
+                custom = update_serializer.Meta.custom
+            except:
+                custom = dict()
+            try:
+                update['tabs'] = update_serializer.Meta.tabs
+            except:
+                update['tabs'] = list()
+            try:
+                inlines = update_serializer.Meta.inlines
+            except:
+                inlines = dict()
+            # 写入的初始化字段数据可以一次性获得
+            update['fields'] = update_serializer.root.data
+            # 开始循环包含的字段
+            meta = dict()
+            for m in update_serializer.Meta.model._meta.fields:
+                if not isinstance(m.default, type):
+                    meta[m.attname] = bool(m.default) if m.__class__.__name__ == 'BoolField' else m.default
+            for key in update_serializer.fields.fields:
+                value = update_serializer.fields.fields[key]
+                if value.__class__.__name__ == 'HiddenField' and value.field_name in create['fields']:
+                    del update['fields'][value.field_name]
+                if value.field_name in update['fields'] and value.field_name in meta:
+                    update['fields'][value.field_name] = meta[value.field_name]
+                self._build_create(update, custom, value)
+            for inline_key, inline_value in inlines.items():
+                inline_create = {
+                    'fields': dict(),
+                    'detail': list(),
+                    'inlines': dict()
+                }
+                inline_serializer = inline_value['class']()
+                try:
+                    inline_custom = inline_serializer.Meta.custom
+                except:
+                    inline_custom = dict()
+                try:
+                    inline_create['tabs'] = inline_serializer.Meta.tabs
+                except:
+                    inline_create['tabs'] = list()
+                inline_create['fields'] = inline_serializer.root.data
+                field = inline_value['field'] if 'field' in inline_value else inline_key
+                del inline_create['fields'][field]
+                for field_key in inline_serializer.fields.fields:
+                    field_value = inline_serializer.fields.fields[field_key]
+                    if field_value.field_name == field:
+                        continue
+                    if field_value.__class__.__name__ == 'HiddenField' and field_value.field_name in inline_create['fields']:
+                        del inline_create['fields'][field_value.field_name]
+                    self._build_create(inline_create, inline_custom, field_value)
+                update['inlines'][inline_key] = {
+                    'label': inline_value['label'] if 'label' in inline_value else inline_serializer.Meta.model._meta.verbose_name,
+                    'create': inline_create,
+                    'limit': inline_value['limit'] if 'limit' in inline_value else self.inlines_limit,
+                    'api': inline_value['api'] if 'api' in inline_value else '',
+                    'field': field
+                }
+                update['fields'][inline_key] = []
         # 写入类的初始化数据结构
         create = {
             'fields': dict(),
@@ -281,6 +353,7 @@ class PageConfigMixin(ListModelMixin):
         res = {
             "filter": filter_data,
             "create": create,
+            "update": update,
             "list": self._build_list(self.list_class),  # 列表字段生成器，业务逻辑和创建的差不多了
             "read": self._build_list(self.read_class),  # 读取格式数据，业务逻辑和创建的差不多了
             "extra": self.extra
