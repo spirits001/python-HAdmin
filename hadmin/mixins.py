@@ -214,7 +214,8 @@ class PageConfigMixin(ListModelMixin):
         update = {
             'fields': dict(),
             'inlines': dict(),
-            'detail': list()
+            'detail': list(),
+            'tabs': list()
         }
         # 判断是否存在修改类
         if self.update_class:
@@ -228,7 +229,7 @@ class PageConfigMixin(ListModelMixin):
             try:
                 update['tabs'] = update_serializer.Meta.tabs
             except:
-                update['tabs'] = list()
+                pass
             try:
                 inlines = update_serializer.Meta.inlines
             except:
@@ -284,7 +285,8 @@ class PageConfigMixin(ListModelMixin):
         create = {
             'fields': dict(),
             'inlines': dict(),
-            'detail': list()
+            'detail': list(),
+            'tabs': list()
         }
         # 判断是否存在写入类
         if self.create_class:
@@ -298,7 +300,7 @@ class PageConfigMixin(ListModelMixin):
             try:
                 create['tabs'] = create_serializer.Meta.tabs
             except:
-                create['tabs'] = list()
+                pass
             try:
                 inlines = create_serializer.Meta.inlines
             except:
