@@ -684,3 +684,5 @@ inlines = {
 1.1.0  增加update
 
 1.1.1  修改默认tabs
+
+1.1.2  修复bug

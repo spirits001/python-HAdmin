@@ -148,7 +148,7 @@ class PageConfigMixin(ListModelMixin):
                 tmp['rules'].append(rule)
             # 把choices的内容放到数据里,这里要判断选择项数量，太多了可不行
             if tmp['type'] in ['PrimaryKeyRelatedField', 'ManyRelatedField', 'ChoiceField']:
-                if tmp['type'] == 'ChoiceField' or (tmp['type'] == 'ManyRelatedField' and value.child_relation.queryset.count() < self.choices_limit) or (
+                if tmp['type'] == 'ChoiceField' or (tmp['type'] == 'ManyRelatedField' and value.child_relation.queryset and value.child_relation.queryset.count() < self.choices_limit) or (
                         tmp['type'] == 'PrimaryKeyRelatedField' and value.queryset.count() < self.choices_limit):
                     for v in value.choices.items():
                         tmp['choices'].append({
