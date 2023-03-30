@@ -243,7 +243,7 @@ class PageConfigMixin(ListModelMixin):
                     meta[m.attname] = bool(m.default) if m.__class__.__name__ == 'BoolField' else m.default
             for key in update_serializer.fields.fields:
                 value = update_serializer.fields.fields[key]
-                if value.__class__.__name__ == 'HiddenField' and value.field_name in create['fields']:
+                if value.__class__.__name__ == 'HiddenField' and value.field_name in update['fields']:
                     del update['fields'][value.field_name]
                 if value.field_name in update['fields'] and value.field_name in meta:
                     update['fields'][value.field_name] = meta[value.field_name]
@@ -361,3 +361,6 @@ class PageConfigMixin(ListModelMixin):
             "extra": self.extra
         }
         return Response(res)
+
+# python setup.py sdist bdist_wheel
+# twine upload dist/*
