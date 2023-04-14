@@ -688,3 +688,5 @@ inlines = {
 1.1.2  修复bug
 
 1.1.3  修复bug
+
+1.1.4  inlines内增加filter参数

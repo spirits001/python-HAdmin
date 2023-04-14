@@ -349,7 +349,8 @@ class PageConfigMixin(ListModelMixin):
                     'create': inline_create,
                     'limit': inline_value['limit'] if 'limit' in inline_value else self.inlines_limit,
                     'api': inline_value['api'] if 'api' in inline_value else '',
-                    'field': field
+                    'field': field,
+                    'filter': inline_value['filter'] if 'filter' in inline_value else []
                 }
                 create['fields'][inline_key] = []
         res = {
