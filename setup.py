@@ -3,7 +3,7 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 setuptools.setup(
     name="hadmin",  # 模块名称
-    version="1.1.4",  # 当前版本
+    version="1.2.0",  # 当前版本
     author="代码厨子",  # 作者
     author_email="15755153@qq.com",  # 作者邮箱
     description="针对自动化给予前端配置文件的DRF封装",  # 模块简介

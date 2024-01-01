@@ -38,7 +38,7 @@ class PageConfigMixin(ListModelMixin):
     # 扩展自定义信息
     extra = None
     # 默认选择项数量
-    choices_limit = 30
+    choices_limit = 500
     # inline模式默认数量限制
     inlines_limit = 10
 
@@ -96,6 +96,15 @@ class PageConfigMixin(ListModelMixin):
                         'message': value.error_messages['required']
                     }
                     tmp['rules'].append(rule)
+                # 把choices的内容放到数据里,这里要判断选择项数量，太多了可不行
+                if tmp['type'] in ['PrimaryKeyRelatedField', 'ManyRelatedField', 'ChoiceField']:
+                    if tmp['type'] == 'ChoiceField' or (tmp['type'] == 'ManyRelatedField' and value.child_relation.queryset and value.child_relation.queryset.count() < self.choices_limit) or (
+                            tmp['type'] == 'PrimaryKeyRelatedField' and value.queryset.count() < self.choices_limit):
+                        for v in value.choices.items():
+                            tmp['choices'].append({
+                                'value': v[0],
+                                'label': v[1]
+                            })
                 # 清洗一下label
                 tmp = self._build_label(tmp, value)
                 # 覆盖自定义数据到配置字典

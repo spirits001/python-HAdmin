@@ -690,3 +690,5 @@ inlines = {
 1.1.3  修复bug
 
 1.1.4  inlines内增加filter参数
+
+1.2.0 新增工具包，详见hadmin.utils
