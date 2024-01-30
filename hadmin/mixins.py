@@ -73,6 +73,7 @@ class PageConfigMixin(ListModelMixin):
                     'method': '',  # 渲染方式，如果没有指定，就采用type来自动匹配
                     'max_length': 0,  # 最大长度
                     'precision': None,  # 小数长度
+                    'choices': [],  # 选择项
                 }
                 # 原始字段类型
                 try:
